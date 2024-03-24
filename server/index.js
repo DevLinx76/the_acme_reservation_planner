@@ -26,7 +26,7 @@ const {
   // Routes for fetching customer information
   app.get('/api/customer', async(req, res, next)=> {
     try {
-      res.send(await fetchCustomer());
+      res.send(await fetchCustomers());
     }
     catch(ex){
       next(ex);
@@ -36,7 +36,7 @@ const {
   // Routes for fetching customer restaurants
  app.get('/api/restaurants', async(req, res, next)=> {
     try {
-      res.send(await fetchRestaurants(req.params.id));
+      res.send(await fetchRestaurants());
     }
     catch(ex){
       next(ex);
@@ -44,9 +44,9 @@ const {
   });
 
   // Routes for creating a reservation
-app.post('/api/customers/:id/reservations', async(req, res, next)=> {
+app.post('/api/customers/:customer_id/reservations', async(req, res, next)=> {
     try {
-      res.send(await createReservation(req.params.id, req.body));
+      res.send(await createReservation({customer_id: req.params.customer_id, ...req.body}));
     }
     catch(ex){
       next(ex);
@@ -56,7 +56,7 @@ app.post('/api/customers/:id/reservations', async(req, res, next)=> {
   // Routes for deleting a reservation
 app.delete('/api/customers/:customer_id/reservations/:id', async(req, res, next)=> {
     try {
-      res.send(await destroyReservation(req.params.id));
+      res.send(await destroyReservation({customer_id: req.params.customer_id, id:req.params.id}));
     }
     catch(ex){
       next(ex);

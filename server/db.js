@@ -9,6 +9,7 @@ const createTables = async()=> {
   const SQL = `
     DROP TABLE IF EXISTS customers;
     DROP TABLE IF EXISTS restaurants;
+    DROP TABLE IF EXISTS reservation;
 
     CREATE TABLE customer(
         id UUID PRIMARY KEY,
@@ -58,9 +59,9 @@ const createReservation = async({reservation_date, party_count, reservation_id, 
 };
 
 // Destroy a reservation
-const destroyReservation = async({id})=> {
-  const SQL = 'DELETE FROM reservation WHERE id = $1';
-  return (await client.query(SQL, [id])).rows[0];
+const destroyReservation = async({id, customer_id})=> {
+  const SQL = 'DELETE FROM reservation WHERE id = $1 AND customer_id=$2';
+  return (await client.query(SQL, [id, customer_id])).rows[0];
 };
 
 
