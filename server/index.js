@@ -76,33 +76,37 @@ app.delete('/api/customers/:customer_id/reservations/:id', async(req, res, next)
     console.log('Connected to the database!');
     await createTables();
     console.log('Tables created!');
-    const [devin, luke, mitch] = await Promise.all([
-        createCustomer({name: 'Devin'}),
-        createCustomer({name: 'Luke'}),
-        createCustomer({name: 'Mitch'}),
-        createRestaurant({name: 'Restaurant1'}),
-        createRestaurant({name: 'Restaurant2'}),
-        createRestaurant({name: 'Restaurant3'}),
-        ]);        
-    console.log('Seeded the database!');
+    
+    // Seed the database with some data
+    const [devin, luke, mitch, restaurant1, restaurant2, restaurant3] = await Promise.all([
+        createCustomer({name: 'devin'}),
+        createCustomer({name: 'luke'}),
+        createCustomer({name: 'mitch'}),
+        createRestaurant({name: 'restaurant1'}),
+        createRestaurant({name: 'restaurant2'}),
+        createRestaurant({name: 'restaurant3'}),
+        ]);           
     console.log(`devin has an id of ${devin.id}`);
     console.log(`mitch has an id of ${mitch.id}`);
     console.log(`luke has an id of ${luke.id}`);
-    console.log(`restaurant1 has an id of ${restaurant1.id}`);
-    console.log(`restaurant2 has an id of ${restaurant2.id}`);
-    console.log(`restaurant3 has an id of ${restaurant3.id}`);
+    console.log(await fetchCustomers());
+    console.log(await fetchRestaurants());
     
     // Create some reservations
     await Promise.all([
-        createReservation({reservation_date: '2020-01-01', party_count: 2, reservation_id: restaurant1.id, customer_id: devin.id}),
-        createReservation({reservation_date: '2020-01-01', party_count: 2, reservation_id: restaurant2.id, customer_id: luke.id}),
-        createReservation({reservation_date: '2020-01-01', party_count: 2, reservation_id: restaurant3.id, customer_id: mitch.id}),
+        createReservation({reservation_date: '2020-01-01', party_count: 2, restaurant_id: restaurant1.id, customer_id: devin.id}),
+        createReservation({reservation_date: '2020-01-01', party_count: 2, restaurant_id: restaurant2.id, customer_id: luke.id}),
+        createReservation({reservation_date: '2020-01-01', party_count: 2, restaurant_id: restaurant3.id, customer_id: mitch.id}),
     ]);
-    console.log('Created some reservations!');
+    const reservations = await fetchReservations();   
+    console.log(reservations);
+    await destroyReservation({id: reservations[0].id, customer_id: devin.id});
+    console.log(await fetchReservations());
 
     
     // Define a middleware function to check if a user is logged in
-    app.listen(3000, ()=> console.log('Listening on port 3000'));
+    const port = process.env.PORT || 3000;
+    app.listen(port, ()=> console.log('listening on port 3000'));
     
   };
   

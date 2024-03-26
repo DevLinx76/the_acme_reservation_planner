@@ -3,28 +3,29 @@
 const pg = require('pg');
 const client = new pg.Client(process.env.DATABASE_URL || 'postgres://localhost/the_acme_reservation_planner_db');
 const uuid = require('uuid');
+const express = require('express');
 
 // Create tables
 const createTables = async()=> {
-  const SQL = `
-    DROP TABLE IF EXISTS customers;
-    DROP TABLE IF EXISTS restaurants;
-    DROP TABLE IF EXISTS reservation;
+  const SQL = `  
+  DROP TABLE IF EXISTS reservations;
+  DROP TABLE IF EXISTS customers;
+  DROP TABLE IF EXISTS restaurants;
 
-    CREATE TABLE customer(
+    CREATE TABLE restaurants(
         id UUID PRIMARY KEY,
         name VARCHAR(100)
     );
-    CREATE TABLE restaurant(        
+    CREATE TABLE customers(        
         id UUID PRIMARY KEY,
         name VARCHAR(100)
     );
-    CREATE TABLE reservation(
+    CREATE TABLE reservations(
         id UUID PRIMARY KEY,
         reservation_date DATE NOT NULL,
         party_count INTEGER NOT NULL,
-        reservation_id UUID REFERENCES restaurants table NOT NULL,
-        customer_id UUID REFERENCES customers table NOT NULL
+        restaurant_id UUID REFERENCES restaurants(id) NOT NULL,
+        customer_id UUID REFERENCES customers(id) NOT NULL
     );
   `;
   await client.query(SQL);
@@ -54,13 +55,13 @@ const fetchRestaurants = async()=> {
 
 // Create a reservation
 const createReservation = async({reservation_date, party_count, reservation_id, customer_id})=> {
-  const SQL = 'INSERT INTO reservation(id, reservation_date, party_count, reservation_id, customer_id) values($1, $2, $3, $4, $5) returning *';
+  const SQL = 'INSERT INTO reservations(id, reservation_date, party_count, restaurant_id, customer_id) values($1, $2, $3, $4, $5) returning *';
   return (await client.query(SQL, [uuid.v4(), reservation_date, party_count, reservation_id, customer_id])).rows[0];
 };
 
 // Destroy a reservation
 const destroyReservation = async({id, customer_id})=> {
-  const SQL = 'DELETE FROM reservation WHERE id = $1 AND customer_id=$2';
+  const SQL = 'DELETE FROM reservations WHERE id = $1 AND customer_id=$2';
   return (await client.query(SQL, [id, customer_id])).rows[0];
 };
 
@@ -71,7 +72,7 @@ module.exports = {
   createCustomer,
   createRestaurant,
   fetchCustomers,
-  fetchRestaurants,
+  fetchRestaurants,  
   createReservation,
   destroyReservation,
 };
