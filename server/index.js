@@ -98,11 +98,6 @@ app.delete('/api/customers/:customer_id/reservations/:id', async(req, res, next)
         createReservation({reservation_date: '2020-01-01', party_count: 2, restaurant_id: restaurant2.id, customer_id: luke.id}),
         createReservation({reservation_date: '2020-01-01', party_count: 2, restaurant_id: restaurant3.id, customer_id: mitch.id}),
     ]);
-    const reservations = await fetchReservations();   
-    console.log(reservations);
-    await destroyReservation({id: reservations[0].id, customer_id: devin.id});
-    console.log(await fetchReservations());
-
     
     // Define a middleware function to check if a user is logged in
     const port = process.env.PORT || 3000;

@@ -54,9 +54,9 @@ const fetchRestaurants = async()=> {
 };
 
 // Create a reservation
-const createReservation = async({reservation_date, party_count, reservation_id, customer_id})=> {
+const createReservation = async({reservation_date, party_count, restaurant_id, customer_id})=> {
   const SQL = 'INSERT INTO reservations(id, reservation_date, party_count, restaurant_id, customer_id) values($1, $2, $3, $4, $5) returning *';
-  return (await client.query(SQL, [uuid.v4(), reservation_date, party_count, reservation_id, customer_id])).rows[0];
+  return (await client.query(SQL, [uuid.v4(), reservation_date, party_count, restaurant_id, customer_id])).rows[0];
 };
 
 // Destroy a reservation
